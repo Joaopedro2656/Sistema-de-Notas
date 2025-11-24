@@ -1,0 +1,179 @@
+/* ARQUIVO: style.css */
+
+/* Reset básico e tipografia */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background-color: #f0f0f0; /* Cor de fundo da área principal */
+    color: #333;
+}
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+/* Layout Principal: Grid para a Sidebar e Conteúdo */
+.app-container {
+    display: flex;
+    min-height: 100vh;
+}
+
+/* --- BARRA LATERAL (SIDEBAR) --- */
+.sidebar {
+    width: 250px; /* Largura da barra lateral */
+    background-color: #1a4f94; /* Azul escuro */
+    color: white;
+    padding: 20px 0;
+    box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between; /* Empurra o botão de sair para baixo */
+}
+
+/* Topo da Sidebar */
+.sidebar-header {
+    padding: 0 20px 20px 20px;
+    text-align: center;
+}
+
+.logo-container {
+    width: 80px;
+    height: 80px;
+    background-color: white;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    /* Estilo de texto 'SN' (Substituir por imagem real se houver) */
+    font-size: 30px;
+    font-weight: bold;
+    color: #1a4f94;
+}
+
+/* Área de Boas-vindas (Perfil) */
+.welcome-box {
+    background-color: #2b5d9e; /* Azul ligeiramente mais claro para a caixa de boas-vindas */
+    padding: 15px 20px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.profile-icon-container {
+    width: 60px;
+    height: 60px;
+    background-color: white;
+    border-radius: 50%;
+    margin: 0 auto 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.profile-icon-container svg {
+    fill: #1a4f94;
+    width: 40px;
+    height: 40px;
+}
+
+.welcome-box p {
+    margin: 5px 0 0;
+}
+
+/* Navegação */
+.sidebar-nav {
+    flex-grow: 1; /* Permite que a navegação ocupe o espaço restante */
+}
+
+.nav-item {
+    display: flex;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #1a4f94; /* Fundo padrão */
+    color: white;
+    font-size: 1.1em;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.nav-item:hover, .nav-item.active {
+    background-color: #0d386d; /* Azul mais escuro ao passar ou ativo */
+}
+
+.nav-item svg {
+    margin-right: 10px;
+    width: 20px;
+    height: 20px;
+    fill: white;
+}
+
+/* Botão Sair */
+.logout-button {
+    padding: 15px 20px;
+    text-align: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    margin-top: 20px;
+}
+
+.logout-button a {
+    color: white;
+    font-size: 1em;
+    opacity: 0.8;
+}
+
+/* --- CONTEÚDO PRINCIPAL --- */
+.main-content {
+    flex-grow: 1;
+    background-color: #e8e8e8; /* Cinza claro da área de conteúdo */
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+}
+
+/* Cabeçalho da área de conteúdo (para notificações) */
+.content-header {
+    background-color: white;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: flex-end; /* Alinha notificações à direita */
+    align-items: center;
+    height: 60px;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+}
+
+.notifications-box {
+    display: flex;
+    align-items: center;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.notifications-box svg {
+    fill: #333;
+    width: 22px;
+    height: 22px;
+    margin-left: 10px;
+    cursor: pointer;
+}
+
+/* Área central de conteúdo */
+.content-body {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+.dashboard-card {
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    margin-bottom: 20px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
