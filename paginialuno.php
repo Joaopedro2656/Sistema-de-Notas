@@ -1,20 +1,16 @@
 <?php
-// Inclui a conexão e verifica o status de login
 include('Conec.php');
 session_start();
 
-// Se o usuário não estiver logado, redireciona para a página de login (login.php)
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     header("Location: login.php");
     exit();
 }
 
-$nome_aluno = $_SESSION['nome_usuario']; // Nome do usuário logado
+$nome_aluno = $_SESSION['nome_usuario'];
 
-// Lógica de Sair da Conta (Logout)
 if (isset($_GET['logout'])) {
     session_destroy();
-    // Redireciona para a página de login (login.php)
     header("Location: login.php");
     exit();
 }
@@ -42,7 +38,6 @@ if (isset($_GET['logout'])) {
             height: 100vh;
         }
 
-        /* Sidebar - Lado Esquerdo */
         .sidebar {
             width: 250px;
             background-color: var(--cor-sidebar);
@@ -85,7 +80,6 @@ if (isset($_GET['logout'])) {
             font-weight: bold;
         }
 
-        /* Área de Perfil */
         .profile-area {
             background-color: var(--cor-sidebar-hover);
             width: 100%;
@@ -112,7 +106,6 @@ if (isset($_GET['logout'])) {
             line-height: 1.4;
         }
 
-        /* Menu de Navegação */
         .nav-menu {
             width: 100%;
         }
@@ -137,7 +130,6 @@ if (isset($_GET['logout'])) {
             font-size: 18px;
         }
         
-        /* Botão de Sair */
         .logout-link {
             margin-top: auto;
             padding: 20px;
@@ -155,8 +147,6 @@ if (isset($_GET['logout'])) {
             background-color: #ff0000;
         }
 
-
-        /* Conteúdo Principal - Lado Direito */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -204,8 +194,7 @@ if (isset($_GET['logout'])) {
 <body>
     <div class="sidebar">
         <div class="logo-header">
-            <div class=""><img src="\\servidormedio\2310872\6 periodo(ultima pasta)\trabalho final\logo notas\Capturar.PNG">
-</div>
+            <div class=""><img src="\\servidormedio\2310872\6 periodo(ultima pasta)\trabalho final\logo notas\Capturar.PNG"></div>
             <div class="espaco-sn">Espaço SN</div>
         </div>
         
