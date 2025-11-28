@@ -1,34 +1,26 @@
 <?php
-// Arquivo: boletimaluno_novo.php - Nova Versão do Boletim Individual
 require_once __DIR__ . '/Conec.php'; 
 session_start();
 
-// --- 1. VERIFICAÇÃO DE ACESSO E DEFINIÇÃO DO PAPEL ---
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
-    // Se não estiver logado, redireciona para o login.
     header("Location: login.php");
     exit();
 }
 
-// Variáveis de estado
 $matriculaSelecionada = null;
 $alunoInfo = null;
 $notasAluno = [];
 $msg = ''; 
 $mediaMinima = 7.0; 
 
-// Pega o nível de acesso e define se é Professor/Aluno
 $nivelAcesso = $_SESSION['nivel_acesso']; 
 $isProfessor = ($nivelAcesso === 'professor');
 $isAluno = ($nivelAcesso === 'aluno');
 
-// 2. Lógica para definir a Matrícula a ser consultada
 if ($isAluno) {
-    // Aluno logado: consulta apenas o próprio boletim.
     $matriculaSelecionada = $_SESSION['id_usuario'];
-    $alunos = []; // Não precisa carregar a lista de alunos
+    $alunos = [];
 } else {
-    // Professor/Outro: precisa carregar a lista de alunos e permitir a seleção.
     try {
         $alunos = $pdo->query("SELECT Matricula, nomeAluno, Curso FROM Aluno ORDER BY nomeAluno ASC")->fetchAll(PDO::FETCH_ASSOC);
     } catch (PDOException $e) {
@@ -36,22 +28,17 @@ if ($isAluno) {
         $msg = '<div class="alert alert-error">Erro ao buscar alunos: ' . $e->getMessage() . '</div>';
     }
 
-    // Processa a seleção do aluno via formulário (dropdown)
     if (isset($_REQUEST['matricula'])) {
         $matriculaSelecionada = trim($_REQUEST['matricula']);
     }
 }
 
-// 3. Se um aluno válido foi definido, busca suas notas e informações
 if ($matriculaSelecionada) {
-    
-    // Busca informações do aluno
     $stmtAluno = $pdo->prepare("SELECT nomeAluno, Curso FROM Aluno WHERE Matricula = :mat");
     $stmtAluno->execute([':mat' => $matriculaSelecionada]);
     $alunoInfo = $stmtAluno->fetch(PDO::FETCH_ASSOC);
 
     if ($alunoInfo) {
-        // SQL para buscar todas as notas do aluno, agrupadas por matéria
         $sqlNotas = "
             SELECT 
                 N.ID_nota, 
@@ -75,7 +62,6 @@ if ($matriculaSelecionada) {
         $stmtNotas->execute([':mat' => $matriculaSelecionada]);
         $notasRaw = $stmtNotas->fetchAll(PDO::FETCH_ASSOC);
         
-        // Reorganiza os resultados: agrupar as notas por Matéria
         foreach ($notasRaw as $nota) {
             $materia = $nota['Materia'];
             if (!isset($notasAluno[$materia])) {
@@ -99,13 +85,11 @@ if ($matriculaSelecionada) {
     <meta charset="utf-8">
     <title>Novo Sistema de Boletim</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Usando classes Tailwind para um design moderno e responsivo -->
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Configuração de Fontes e Cores base */
         :root {
-            --primary: #1e40af; /* Tailwind blue-700 */
-            --secondary: #3b82f6; /* Tailwind blue-500 */
+            --primary: #1e40af;
+            --secondary: #3b82f6;
         }
         body {
             font-family: 'Inter', sans-serif;
@@ -115,9 +99,8 @@ if ($matriculaSelecionada) {
         .container {
             max-width: 960px;
         }
-        /* Estilos customizados para a tabela e status */
-        .aprovado { color: #10b981; font-weight: 700; } /* Tailwind emerald-500 */
-        .reprovado { color: #ef4444; font-weight: 700; } /* Tailwind red-500 */
+        .aprovado { color: #10b981; font-weight: 700; }
+        .reprovado { color: #ef4444; font-weight: 700; }
     </style>
 </head>
 <body class="p-4 md:p-8">
@@ -139,7 +122,7 @@ if ($matriculaSelecionada) {
         <?= $msg ?>
     </div>
 
-    <?php if ($isProfessor): // APENAS PROFESSOR VÊ O SELETOR DE ALUNOS ?>
+    <?php if ($isProfessor): ?>
         <div class="bg-white p-6 rounded-xl shadow-lg mb-8">
             <h2 class="text-xl font-semibold text-gray-700 border-b pb-3 mb-4">Consulta de Aluno</h2>
             <form method="get" action="boletimaluno_novo.php" class="flex flex-col sm:flex-row items-center gap-4">
@@ -162,7 +145,7 @@ if ($matriculaSelecionada) {
         </div>
     <?php endif; ?>
     
-    <?php if ($alunoInfo): // Exibe o Boletim ?>
+    <?php if ($alunoInfo): ?>
         <div class="bg-white p-6 rounded-xl shadow-lg">
             <h2 class="text-2xl font-bold text-blue-700 mb-3"><?= htmlspecialchars($alunoInfo['nomeAluno']) ?></h2>
             <div class="flex flex-wrap gap-x-6 text-gray-600 mb-6 border-b pb-4">
@@ -177,7 +160,6 @@ if ($matriculaSelecionada) {
                 </div>
             <?php else: ?>
                 <?php 
-                // Itera sobre cada matéria
                 foreach ($notasAluno as $materia => $dados): 
                     $media = $dados['total_notas'] > 0 ? $dados['soma_notas'] / $dados['total_notas'] : 0;
                     $situacao = ($media >= $mediaMinima) ? 'Aprovado' : 'Reprovado';
@@ -186,7 +168,6 @@ if ($matriculaSelecionada) {
                     <div class="materia-section border border-gray-200 rounded-lg p-4 mb-6 shadow-sm">
                         <h3 class="text-xl font-semibold mb-3 text-blue-800 border-b border-blue-100 pb-2">Matéria: <?= htmlspecialchars($materia) ?></h3>
                         
-                        <!-- Tabela Responsiva -->
                         <div class="overflow-x-auto">
                             <table class="min-w-full divide-y divide-gray-200">
                                 <thead class="bg-gray-50">
@@ -199,9 +180,7 @@ if ($matriculaSelecionada) {
                                     </tr>
                                 </thead>
                                 <tbody class="bg-white divide-y divide-gray-200">
-                                    <?php 
-                                    foreach ($dados['notas'] as $nota): 
-                                    ?>
+                                    <?php foreach ($dados['notas'] as $nota): ?>
                                         <tr>
                                             <td class="px-3 py-3 whitespace-nowrap text-sm font-medium text-gray-900"><?= number_format((float)$nota['Valor_nota'], 2, ',', '.') ?></td>
                                             <td class="px-3 py-3 whitespace-nowrap text-sm text-gray-500"><?= htmlspecialchars($nota['Tipo_avaliacao']) ?></td>
@@ -238,12 +217,12 @@ if ($matriculaSelecionada) {
     <?php elseif ($matriculaSelecionada): ?>
         <div class="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg" role="alert">
             <p class="font-bold">Erro na Consulta:</p>
-            <p>O aluno com Matrícula **<?= htmlspecialchars($matriculaSelecionada) ?>** não foi encontrado. Verifique se a Matrícula está correta ou se o aluno está cadastrado na tabela `Aluno`.</p>
+            <p>O aluno com Matrícula <?= htmlspecialchars($matriculaSelecionada) ?> não foi encontrado.</p>
         </div>
     <?php else: ?>
         <div class="bg-blue-100 border-l-4 border-blue-500 text-blue-700 p-4 rounded-lg" role="alert">
             <p class="font-bold">Aguardando Seleção:</p>
-            <p>Selecione um aluno na lista acima para visualizar seu boletim detalhado.</p>
+            <p>Selecione um aluno acima para visualizar o boletim.</p>
         </div>
     <?php endif; ?>
 </main>
