@@ -1,21 +1,16 @@
 <?php
-// Inclui a conexão e verifica o status de login
 include('Conec.php');
 session_start();
 
-// Se o usuário não estiver logado, redireciona para a página de login (login.php)
 if (!isset($_SESSION['logado']) || $_SESSION['logado'] !== true) {
     header("Location: login.php");
     exit();
 }
 
-// Assumindo que o nome do professor está armazenado na sessão
-$nome_professor = $_SESSION['nome_usuario']; 
+$nome_professor = $_SESSION['nome_usuario'];
 
-// Lógica de Sair da Conta (Logout)
 if (isset($_GET['logout'])) {
     session_destroy();
-    // Redireciona para a página de login (login.php)
     header("Location: login.php");
     exit();
 }
@@ -34,7 +29,7 @@ if (isset($_GET['logout'])) {
             --cor-topo: #1f50a9;
             --cor-principal: #f0f0f0;
             --cor-texto-claro: #ffffff;
-            --cor-botao-principal: #3a7bd5; /* Azul um pouco mais claro para botões de ação */
+            --cor-botao-principal: #3a7bd5;
             --cor-sombra: rgba(0,0,0,0.1);
         }
 
@@ -45,7 +40,6 @@ if (isset($_GET['logout'])) {
             height: 100vh;
         }
 
-        /* Sidebar - Lado Esquerdo (Estrutura Fornecida) */
         .sidebar {
             width: 250px;
             background-color: var(--cor-sidebar);
@@ -67,7 +61,6 @@ if (isset($_GET['logout'])) {
             margin-bottom: 20px;
         }
 
-        /* Adaptado para exibir um ícone padrão, pois o caminho da imagem não é acessível */
         .logo-icon {
             font-size: 28px;
             margin-right: 10px;
@@ -78,7 +71,6 @@ if (isset($_GET['logout'])) {
             font-weight: bold;
         }
 
-        /* Área de Perfil */
         .profile-area {
             background-color: var(--cor-sidebar-hover);
             width: 100%;
@@ -105,10 +97,9 @@ if (isset($_GET['logout'])) {
             line-height: 1.4;
         }
 
-        /* Menu de Navegação */
         .nav-menu {
             width: 100%;
-            flex-grow: 1; /* Permite que o menu ocupe o espaço restante */
+            flex-grow: 1;
         }
 
         .nav-menu a {
@@ -131,7 +122,6 @@ if (isset($_GET['logout'])) {
             font-size: 18px;
         }
         
-        /* Botão de Sair */
         .logout-link {
             padding: 20px;
             text-align: center;
@@ -141,7 +131,7 @@ if (isset($_GET['logout'])) {
             text-decoration: none;
             width: 100%;
             box-sizing: border-box;
-            background-color: #d9534f; /* Vermelho para destaque */
+            background-color: #d9534f;
             transition: background-color 0.3s;
         }
         
@@ -149,8 +139,6 @@ if (isset($_GET['logout'])) {
             background-color: #c9302c;
         }
 
-
-        /* Conteúdo Principal - Lado Direito (Estrutura Fornecida) */
         .main-content {
             flex-grow: 1;
             display: flex;
@@ -189,13 +177,12 @@ if (isset($_GET['logout'])) {
         .content-box {
             background-color: #ffffff;
             border: 1px solid #ddd;
-            min-height: 80vh; /* Ajustado para melhor visualização */
+            min-height: 80vh;
             border-radius: 5px;
             padding: 20px;
             box-shadow: 0 2px 5px rgba(0,0,0,0.05);
         }
         
-        /* Estilos dos Botões do Dashboard */
         .dashboard-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -233,9 +220,9 @@ if (isset($_GET['logout'])) {
             transition: color 0.3s;
         }
 
-        .dashboard-button:nth-child(2) i { color: #5cb85c; } /* Verde para Notas */
-        .dashboard-button:nth-child(3) i { color: #f0ad4e; } /* Amarelo para Professores */
-        .dashboard-button:nth-child(4) i { color: #d9534f; } /* Vermelho para Boletim */
+        .dashboard-button:nth-child(2) i { color: #5cb85c; }
+        .dashboard-button:nth-child(3) i { color: #f0ad4e; }
+        .dashboard-button:nth-child(4) i { color: #d9534f; }
 
         .button-title {
             font-weight: bold;
@@ -251,7 +238,6 @@ if (isset($_GET['logout'])) {
 <body>
     <div class="sidebar">
         <div class="logo-header">
-            <!-- Usando ícone padrão, pois o caminho da imagem não é acessível -->
             <i class="fas fa-graduation-cap logo-icon"></i> 
             <div class="espaco-sn">Espaço SN</div>
         </div>
@@ -266,12 +252,10 @@ if (isset($_GET['logout'])) {
 
         <nav class="nav-menu">
             <a href="pagiiniprof.php" class="active"><i class="fas fa-home"></i> Página inicial</a>
-            <!-- Links de navegação do Professor, embora os principais estejam no conteúdo -->
             <a href="Nota.php"><i class="fas fa-pencil-alt"></i> Lançar Notas</a>
             <a href="BoletimTurma.php"><i class="fas fa-clipboard-list"></i> Boletim de Turma</a>
         </nav>
         
-        <!-- O link de logout precisa apontar para este mesmo arquivo com o parâmetro 'logout=true' -->
         <a href="pagiiniprof.php?logout=true" class="logout-link">sair da conta</a>
     </div>
 
@@ -287,31 +271,25 @@ if (isset($_GET['logout'])) {
                 <h2>Acesso Rápido - Funções do Professor</h2>
                 <p>Clique em uma das opções abaixo para gerenciar alunos, notas e relatórios.</p>
 
-                <!-- Grade de Botões de Acesso Rápido -->
                 <div class="dashboard-grid">
-
-                    <!-- Botão 1: Gestão de Alunos (Aluno.php) -->
                     <a href="Aluno.php" class="dashboard-button">
                         <i class="fas fa-users"></i>
                         <span class="button-title">Gestão de Alunos</span>
                         <span class="button-subtitle">Adicionar, editar e visualizar cadastros.</span>
                     </a>
 
-                    <!-- Botão 2: Lançamento de Notas (Nota.php) -->
                     <a href="Nota.php" class="dashboard-button">
                         <i class="fas fa-edit"></i>
                         <span class="button-title">Lançamento de Notas</span>
                         <span class="button-subtitle">Inserir e atualizar notas das disciplinas.</span>
                     </a>
 
-                    <!-- Botão 3: Gestão de Professores (Professor.php) -->
                     <a href="Professor.php" class="dashboard-button">
                         <i class="fas fa-chalkboard-teacher"></i>
                         <span class="button-title">Cadastro de Professores</span>
                         <span class="button-subtitle">Gerenciar dados e atribuições docentes.</span>
                     </a>
 
-                    <!-- Botão 4: Emissão de Boletim (BoletimTurma.php) -->
                     <a href="BoletimTurma.php" class="dashboard-button">
                         <i class="fas fa-file-invoice"></i>
                         <span class="button-title">Boletins da Turma</span>
