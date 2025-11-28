@@ -1,8 +1,6 @@
 <?php
-// Assumindo que este arquivo é 'Nota.php'
 require_once __DIR__ . '/Conec.php';
 
-// Função auxiliar para verificar a existência de um ID em uma tabela
 function checkExistence($pdo, $table, $column, $value) {
     if (empty($value)) return false;
     $stmt = $pdo->prepare("SELECT 1 FROM {$table} WHERE {$column} = :val");
@@ -10,9 +8,7 @@ function checkExistence($pdo, $table, $column, $value) {
     return (bool)$stmt->fetch();
 }
 
-// --- LISTA ESTÁTICA DE DISCIPLINAS (ATUALIZADA) ---
 $disciplinas_disponiveis = [
-    // Matérias Gerais
     'Educação Física', 
     'Filosofia', 
     'Língua Portuguesa', 
@@ -20,45 +16,30 @@ $disciplinas_disponiveis = [
     'Português', 
     'Redação', 
     'Sociologia',
-    // Matérias de Informática
     'Análise e Desenvolvimento de Projetos', 
     'Programação Web', 
     'Redes de Computadores'
 ];
 
-
-// --- BUCANDO DADOS PARA SELECTS (UX) ---
 try {
-    // Alunos: Para o select de Matrícula
     $alunos = $pdo->query("SELECT Matricula, nomeAluno FROM Aluno ORDER BY nomeAluno")->fetchAll(PDO::FETCH_ASSOC);
-    
-    // Turmas: Para o select de ID da Turma
     $turmas = $pdo->query("SELECT ID_turma, Semestre, Ano FROM Turma ORDER BY Ano DESC, Semestre ASC")->fetchAll(PDO::FETCH_ASSOC);
-
     $tipos_avaliacao = ['Prova', 'Trabalho', 'Simulado'];
-
 } catch (PDOException $e) {
     $alunos = $turmas = [];
 }
 
-
-// --- Processamento de POST para Adicionar e Atualizar ---
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $acao = $_POST['acao'] ?? '';
-    
-    // 1. Dados da Nota - Captura e sanitização
     $id_nota = (int)($_POST['id_nota'] ?? 0); 
     $matricula = trim($_POST['matricula'] ?? ''); 
     $id_turma = (int)($_POST['id_turma'] ?? 0); 
-    $materia = trim($_POST['materia'] ?? ''); // NOVO CAMPO: Materia
-    
+    $materia = trim($_POST['materia'] ?? ''); 
     $valor_nota = trim($_POST['valor_nota'] ?? ''); 
-    $valor_nota = str_replace(',', '.', $valor_nota); // Correção do decimal
-    
+    $valor_nota = str_replace(',', '.', $valor_nota);
     $data_lancamento = trim($_POST['data_lancamento'] ?? ''); 
     $tipo_avaliacao = trim($_POST['tipo_avaliacao'] ?? ''); 
 
-    // --- VALIDAÇÃO DE CAMPOS E CHAVES ESTRANGEIRAS (FK) ---
     $campos_base_validos = ($id_nota > 0 && $matricula !== '' && $id_turma > 0 && $valor_nota !== '' && $data_lancamento !== '' && $tipo_avaliacao !== '' && $materia !== '');
 
     if ($campos_base_validos) {
@@ -72,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ADICIONAR
     if ($acao === 'adicionar' && $campos_base_validos) {
         if (checkExistence($pdo, 'Nota', 'ID_nota', $id_nota)) {
             header('Location: Nota.php?erro=duplicidade_id'); 
@@ -97,7 +77,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     }
 
-    // ATUALIZAR
     if ($acao === 'atualizar' && $campos_base_validos) {
         try {
             $up = $pdo->prepare("UPDATE Nota SET Matricula=:mat, ID_turma=:idturma, Valor_nota=:valor, Data_lancamento=:data, Tipo_avaliacao=:tipo, Materia=:materia 
@@ -123,7 +102,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-// --- Processamento de GET para Excluir ---
 if (($_GET['acao'] ?? '') === 'excluir') {
     $id = (int)($_GET['ID_nota'] ?? 0);
     if ($id > 0) {
@@ -134,7 +112,6 @@ if (($_GET['acao'] ?? '') === 'excluir') {
     exit;
 }
 
-// --- Lógica para Editar (Pré-preenchimento do formulário) ---
 $editando = false;
 $notaEdit = [
     'ID_nota' => 0,
@@ -158,7 +135,6 @@ if (($_GET['acao'] ?? '') === 'editar') {
     }
 }
 
-// --- Listagem de Dados ---
 $sqlLista = "
     SELECT 
         n.ID_nota, 
@@ -180,15 +156,14 @@ $sqlLista = "
 
 $lista = $pdo->query($sqlLista)->fetchAll(PDO::FETCH_ASSOC);
 
-// --- Mensagens de Erro ---
 $msg = '';
 if (isset($_GET['erro'])) {
     if ($_GET['erro']==='fk_aluno') {
-        $msg = '<div class="alert alert-error">Erro: A **Matrícula** informada não existe na tabela Aluno.</div>';
+        $msg = '<div class="alert alert-error">Erro: A Matrícula informada não existe.</div>';
     } elseif ($_GET['erro']==='fk_turma') {
-        $msg = '<div class="alert alert-error">Erro: O **ID da Turma** informado não existe na tabela Turma.</div>';
+        $msg = '<div class="alert alert-error">Erro: O ID da Turma informado não existe.</div>';
     } elseif ($_GET['erro']==='duplicidade_id') {
-        $msg = '<div class="alert alert-error">Erro: O **ID da Nota** informado já está em uso.</div>';
+        $msg = '<div class="alert alert-error">Erro: O ID da Nota já está em uso.</div>';
     } elseif ($_GET['erro']==='db') {
         $msg = '<div class="alert alert-error">Erro no Banco de Dados.</div>';
     }
@@ -200,14 +175,15 @@ if (isset($_GET['erro'])) {
     <meta charset="utf-8">
     <title>CRUD Simples de Notas</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css" >
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <header>
     <div class="container">
         <h1>Notas Lançadas</h1>
-        <nav><a href="Nota.php" class="btn">Nova Nota</a></nav> </div>
+        <nav><a href="Nota.php" class="btn">Nova Nota</a></nav>
+    </div>
 </header>
 
 <main class="container">
@@ -221,15 +197,15 @@ if (isset($_GET['erro'])) {
                 <th>Aluno (Matrícula)</th>
                 <th>Turma (ID)</th>
                 <th>Matéria</th>
-                <th>Nota (Valor)</th>
-                <th>Data Lançamento</th>
-                <th>Avaliação (Tipo)</th>
+                <th>Nota</th>
+                <th>Data</th>
+                <th>Avaliação</th>
                 <th>Ações</th>
             </tr>
         </thead>
         <tbody>
         <?php if (empty($lista)): ?>
-            <tr><td colspan="8">Nenhuma nota cadastrada.</td></tr> 
+            <tr><td colspan="8">Nenhuma nota cadastrada.</td></tr>
         <?php else: ?>
             <?php foreach ($lista as $n): ?>
                 <tr>
@@ -237,13 +213,12 @@ if (isset($_GET['erro'])) {
                     <td><?= htmlspecialchars($n['nomeAluno']) ?> (<?= htmlspecialchars($n['Matricula']) ?>)</td>
                     <td><?= htmlspecialchars($n['ID_turma']) ?></td>
                     <td><?= htmlspecialchars($n['Materia']) ?></td>
-                    <td><?= number_format((float)$n['Valor_nota'], 2, ',', '.') ?></td> 
-                    <td><?= htmlspecialchars($n['Data_lancamento']) ?></td> 
-                    <td><?= htmlspecialchars($n['Tipo_avaliacao']) ?></td> 
+                    <td><?= number_format((float)$n['Valor_nota'], 2, ',', '.') ?></td>
+                    <td><?= htmlspecialchars($n['Data_lancamento']) ?></td>
+                    <td><?= htmlspecialchars($n['Tipo_avaliacao']) ?></td>
                     <td class="acao">
                         <a class="btn btn-secondary" href="?acao=editar&ID_nota=<?= urlencode($n['ID_nota']) ?>">Editar</a>
-                        <a class="btn btn-danger" href="?acao=excluir&ID_nota=<?= urlencode($n['ID_nota']) ?>"
-                           onclick="return confirm('Excluir esta nota (ID: <?= $n['ID_nota'] ?>)?');">Excluir</a>
+                        <a class="btn btn-danger" href="?acao=excluir&ID_nota=<?= urlencode($n['ID_nota']) ?>" onclick="return confirm('Excluir esta nota?');">Excluir</a>
                     </td>
                 </tr>
             <?php endforeach; ?>
@@ -263,12 +238,10 @@ if (isset($_GET['erro'])) {
         <div class="form-row">
             <div class="form-group">
                 <label for="id_nota">ID Nota</label>
-                <input type="number" id="id_nota" name="id_nota" required
-                        value="<?= htmlspecialchars($notaEdit['ID_nota']) ?>"
-                        <?= $editando ? 'readonly' : '' ?> > 
+                <input type="number" id="id_nota" name="id_nota" required value="<?= htmlspecialchars($notaEdit['ID_nota']) ?>" <?= $editando ? 'readonly' : '' ?>>
             </div>
             <div class="form-group">
-                <label for="matricula">Aluno (Matrícula)</label>
+                <label for="matricula">Aluno</label>
                 <select id="matricula" name="matricula" required>
                     <option value="">Selecione o Aluno</option>
                     <?php 
@@ -282,6 +255,7 @@ if (isset($_GET['erro'])) {
                     <?php endforeach; ?>
                 </select>
             </div>
+
             <div class="form-group">
                 <label for="id_turma">Turma</label>
                 <select id="id_turma" name="id_turma" required>
@@ -302,22 +276,20 @@ if (isset($_GET['erro'])) {
         <div class="form-row">
             <div class="form-group">
                 <label for="valor_nota">Nota</label>
-                <input type="number" id="valor_nota" name="valor_nota" step="0.01" min="0" max="999.99" required
-                        value="<?= htmlspecialchars($notaEdit['Valor_nota']) ?>"> </div>
+                <input type="number" id="valor_nota" name="valor_nota" step="0.01" min="0" max="999.99" required value="<?= htmlspecialchars($notaEdit['Valor_nota']) ?>">
+            </div>
+
             <div class="form-group">
-                <label for="data_lancamento">Data de Lançamento</label>
-                <input type="date" id="data_lancamento" name="data_lancamento" required
-                        value="<?= htmlspecialchars($notaEdit['Data_lancamento']) ?>"> </div>
+                <label for="data_lancamento">Data</label>
+                <input type="date" id="data_lancamento" name="data_lancamento" required value="<?= htmlspecialchars($notaEdit['Data_lancamento']) ?>">
+            </div>
             
             <div class="form-group">
                 <label for="materia">Matéria</label>
                 <select id="materia" name="materia" required>
                     <option value="">Selecione a Matéria</option>
                     <?php $materiaAtual = htmlspecialchars($notaEdit['Materia']); ?>
-                    <?php 
-                    // Usa a lista estática definida no início do script
-                    foreach ($disciplinas_disponiveis as $d): 
-                    ?>
+                    <?php foreach ($disciplinas_disponiveis as $d): ?>
                         <option value="<?= htmlspecialchars($d) ?>" <?= ($materiaAtual == $d ? 'selected' : '') ?>>
                             <?= htmlspecialchars($d) ?>
                         </option>
@@ -326,7 +298,7 @@ if (isset($_GET['erro'])) {
             </div>
 
             <div class="form-group">
-                <label for="tipo_avaliacao">Tipo de Avaliação</label>
+                <label for="tipo_avaliacao">Tipo</label>
                 <select id="tipo_avaliacao" name="tipo_avaliacao" required>
                     <option value="">Selecione o Tipo</option>
                     <?php $tipoAtual = htmlspecialchars($notaEdit['Tipo_avaliacao']); ?>
@@ -343,7 +315,8 @@ if (isset($_GET['erro'])) {
             <?php if ($editando): ?>
                 <input type="hidden" name="acao" value="atualizar">
                 <button class="btn" type="submit">Salvar Alterações</button>
-                <a class="btn btn-secondary" href="Nota.php">Cancelar</a> <?php else: ?>
+                <a class="btn btn-secondary" href="Nota.php">Cancelar</a>
+            <?php else: ?>
                 <input type="hidden" name="acao" value="adicionar">
                 <button class="btn" type="submit">Adicionar Nota</button>
             <?php endif; ?>
@@ -356,5 +329,6 @@ if (isset($_GET['erro'])) {
         <small>&copy; <?= date('Y') ?> — Sistema Escola (Notas)</small>
     </div>
 </footer>
+
 </body>
 </html>
