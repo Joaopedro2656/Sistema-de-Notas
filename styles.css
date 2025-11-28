@@ -1,10 +1,7 @@
-/* ARQUIVO: style.css */
-
-/* Reset básico e tipografia */
 body {
     margin: 0;
     font-family: Arial, sans-serif;
-    background-color: #f0f0f0; /* Cor de fundo da área principal */
+    background-color: #f0f0f0;
     color: #333;
 }
 
@@ -13,25 +10,22 @@ a {
     color: inherit;
 }
 
-/* Layout Principal: Grid para a Sidebar e Conteúdo */
 .app-container {
     display: flex;
     min-height: 100vh;
 }
 
-/* --- BARRA LATERAL (SIDEBAR) --- */
 .sidebar {
-    width: 250px; /* Largura da barra lateral */
-    background-color: #1a4f94; /* Azul escuro */
+    width: 250px;
+    background-color: #1a4f94;
     color: white;
     padding: 20px 0;
     box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    justify-content: space-between; /* Empurra o botão de sair para baixo */
+    justify-content: space-between;
 }
 
-/* Topo da Sidebar */
 .sidebar-header {
     padding: 0 20px 20px 20px;
     text-align: center;
@@ -47,15 +41,13 @@ a {
     align-items: center;
     justify-content: center;
     overflow: hidden;
-    /* Estilo de texto 'SN' (Substituir por imagem real se houver) */
     font-size: 30px;
     font-weight: bold;
     color: #1a4f94;
 }
 
-/* Área de Boas-vindas (Perfil) */
 .welcome-box {
-    background-color: #2b5d9e; /* Azul ligeiramente mais claro para a caixa de boas-vindas */
+    background-color: #2b5d9e;
     padding: 15px 20px;
     text-align: center;
     margin-bottom: 20px;
@@ -82,16 +74,15 @@ a {
     margin: 5px 0 0;
 }
 
-/* Navegação */
 .sidebar-nav {
-    flex-grow: 1; /* Permite que a navegação ocupe o espaço restante */
+    flex-grow: 1;
 }
 
 .nav-item {
     display: flex;
     align-items: center;
     padding: 15px 20px;
-    background-color: #1a4f94; /* Fundo padrão */
+    background-color: #1a4f94;
     color: white;
     font-size: 1.1em;
     cursor: pointer;
@@ -99,7 +90,7 @@ a {
 }
 
 .nav-item:hover, .nav-item.active {
-    background-color: #0d386d; /* Azul mais escuro ao passar ou ativo */
+    background-color: #0d386d;
 }
 
 .nav-item svg {
@@ -109,7 +100,6 @@ a {
     fill: white;
 }
 
-/* Botão Sair */
 .logout-button {
     padding: 15px 20px;
     text-align: center;
@@ -123,21 +113,19 @@ a {
     opacity: 0.8;
 }
 
-/* --- CONTEÚDO PRINCIPAL --- */
 .main-content {
     flex-grow: 1;
-    background-color: #e8e8e8; /* Cinza claro da área de conteúdo */
+    background-color: #e8e8e8;
     padding: 0;
     display: flex;
     flex-direction: column;
 }
 
-/* Cabeçalho da área de conteúdo (para notificações) */
 .content-header {
     background-color: white;
     padding: 10px 20px;
     display: flex;
-    justify-content: flex-end; /* Alinha notificações à direita */
+    justify-content: flex-end;
     align-items: center;
     height: 60px;
     box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
@@ -158,7 +146,6 @@ a {
     cursor: pointer;
 }
 
-/* Área central de conteúdo */
 .content-body {
     padding: 20px;
     flex-grow: 1;
