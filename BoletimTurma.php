@@ -1,13 +1,10 @@
 <?php
-// Assumindo que este arquivo é 'BoletimTurma.php'
 require_once __DIR__ . '/Conec.php'; 
 
-// Variáveis de estado
 $idTurmaSelecionada = null;
 $resultadosBoletim = [];
 $turmaInfo = null;
 
-// 1. Busca todas as turmas disponíveis para o SELECT
 try {
     $turmas = $pdo->query("SELECT ID_turma, Semestre, Ano FROM Turma ORDER BY Ano DESC, Semestre ASC")->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
@@ -15,22 +12,15 @@ try {
     $msg = '<div class="alert alert-error">Erro ao buscar turmas: ' . $e->getMessage() . '</div>';
 }
 
-// 2. Processa a seleção da turma (GET ou POST)
 if (isset($_REQUEST['idTurma'])) {
-    // Usamos $_REQUEST para pegar tanto GET quanto POST
     $idTurmaSelecionada = filter_var($_REQUEST['idTurma'], FILTER_VALIDATE_INT);
 }
 
-// 3. Se uma turma válida foi selecionada, calcula as médias por matéria
 if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
-    
-    // Busca informações da turma
     $stmtTurma = $pdo->prepare("SELECT Semestre, Ano FROM Turma WHERE ID_turma = :id");
     $stmtTurma->execute([':id' => $idTurmaSelecionada]);
     $turmaInfo = $stmtTurma->fetch(PDO::FETCH_ASSOC);
 
-    // SQL para calcular a MÉDIA DAS NOTAS POR ALUNO E POR MATÉRIA na turma selecionada
-    // O GROUP BY inclui a Materia para garantir que as médias sejam separadas.
     $sqlBoletim = "
         SELECT 
             A.Matricula, 
@@ -53,7 +43,6 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
     $stmtBoletim->execute([':idTurma' => $idTurmaSelecionada]);
     $resultadosBoletimRaw = $stmtBoletim->fetchAll(PDO::FETCH_ASSOC);
 
-    // Reorganiza os resultados para agrupar as matérias por aluno
     $resultadosBoletim = [];
     foreach ($resultadosBoletimRaw as $r) {
         $matricula = $r['Matricula'];
@@ -74,10 +63,10 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
 <!doctype html>
 <html lang="pt-br">
 <head>
-    <meta charset="utf-8">
-    <title>Boletim e Média por Turma</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="style.css" >
+    <meta charset="utf-8">
+    <title>Boletim e Média por Turma</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="style.css">
     <style>
         .aprovado { color: green; font-weight: bold; }
         .reprovado { color: red; font-weight: bold; }
@@ -89,9 +78,9 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
 <body>
 
 <header>
-    <div class="container">
-        <h1>Boletim Detalhado da Turma</h1>
-        <nav><a href="BoletimTurma.php" class="btn">Nova Consulta</a></nav> 
+    <div class="container">
+        <h1>Boletim Detalhado da Turma</h1>
+        <nav><a href="BoletimTurma.php" class="btn">Nova Consulta</a></nav> 
     </div>
 </header>
 
@@ -125,9 +114,7 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
             <p>Nenhum aluno com notas lançadas nesta turma.</p>
         <?php else: ?>
             <?php 
-            $mediaMinima = 7.0; // Defina aqui a média mínima de aprovação
-            $materiasListadas = [];
-            // Itera sobre cada aluno
+            $mediaMinima = 7.0;
             foreach ($resultadosBoletim as $aluno): 
             ?>
                 <div class="aluno-card">
@@ -144,7 +131,6 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
                         </thead>
                         <tbody>
                             <?php 
-                            // Itera sobre as médias por matéria para este aluno
                             foreach ($aluno['medias'] as $materia => $dados): 
                                 $media = (float)$dados['MediaFinal'];
                                 $situacao = ($media >= $mediaMinima) ? 'Aprovado' : 'Reprovado';
@@ -167,16 +153,16 @@ if ($idTurmaSelecionada !== false && $idTurmaSelecionada > 0) {
         <?php endif; ?>
 
     <?php elseif ($idTurmaSelecionada): ?>
-        <p>A Turma ID **<?= htmlspecialchars($idTurmaSelecionada) ?>** foi selecionada, mas ocorreu um erro ou ela não existe.</p>
+        <p>A Turma ID <?= htmlspecialchars($idTurmaSelecionada) ?> foi selecionada, mas ocorreu um erro ou ela não existe.</p>
     <?php else: ?>
         <p>Selecione uma turma para visualizar o boletim.</p>
     <?php endif; ?>
 </main>
 
 <footer>
-    <div class="container">
-        <small>&copy; <?= date('Y') ?> — Sistema Escola (Boletim)</small>
-    </div>
+    <div class="container">
+        <small>&copy; <?= date('Y') ?> — Sistema Escola (Boletim)</small>
+    </div>
 </footer>
 </body>
 </html>
